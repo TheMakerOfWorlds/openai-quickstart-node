@@ -10,7 +10,7 @@ export default async function (req, res) {
     req.body;
   const completion = await openai.createCompletion({
     model: "text-davinci-003",
-    prompt: generateGiftIdeas(
+    prompt: generateGiftIdeasPrompt(
       eventName,
       relationship,
       gender,
@@ -19,13 +19,16 @@ export default async function (req, res) {
       priceMin,
       priceMax
     ),
-    temperature: 0.6,
+    temperature: 0.7,
     max_tokens: 2048,
   });
-  res.status(200).json({ result: completion.data.choices[0].text });
+
+  res
+    .status(200)
+    .json({ result: outputArray(completion.data.choices[0].text) });
 }
 
-function generateGiftIdeas(
+function generateGiftIdeasPrompt(
   eventName = "",
   relationship = "",
   gender = "",
@@ -67,4 +70,46 @@ function generateGiftIdeas(
   prompt += ".";
   prompt += " surround name with ** than a short description";
   return prompt;
+}
+function outputArray(inputString) {
+  const outputArray = inputString.split("\n").map((item) => {
+    let title = "";
+    let description = "";
+
+    if (item.match(/^\d/)) {
+      item = item.slice(1);
+    }
+    if (item[0] == "." || item[0] == ",") {
+      item = item.slice(1);
+    }
+    item = item.trim();
+
+    console.log(item);
+    if (item[0] == "*" && item[1] == "*") {
+      const titleEndIndex = item.indexOf("**", 2);
+
+      title = item.substring(2, titleEndIndex);
+      if (title.match(/^\d/)) {
+        if (title[1] == "." || title[1] == ",") {
+          title = title.slice(2);
+          title = title.trim();
+        }
+      }
+      description = item.substring(titleEndIndex + 2);
+      description = description.trim();
+      if (description[0] == "-") {
+        description = description.slice(1);
+        description = description.trim();
+      }
+    } else {
+      title = "Gift Idea";
+      if (item.trim() == "") {
+        return;
+      } else {
+        description = item.trim();
+      }
+    }
+    return { title, description };
+  });
+  return outputArray.filter((n) => n);
 }
