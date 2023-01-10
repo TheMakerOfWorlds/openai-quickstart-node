@@ -1,20 +1,48 @@
-async function getPhotos(req, res) {
-  try {
-    const options = {
-      method: "GET",
-      url: `https://api.unsplash.com/search/photos?page=1&query=${req}`,
-    };
+export default async function getPhotos(req, res) {
+  req = ["climbing shoes", "speaker", "mirror"];
 
-    request(options, (error, response, body) => {
-      if (error) throw new Error(error);
+  // try {
+  //   const response = await fetch(
+  //     `https://api.unsplash.com/search/photos?page=1&per_page=1&orientation=squarish&query=${req}&client_id=${process.env.UNSPLASH_API_KEY}`,
+  //     {
+  //       method: "GET",
+  //     }
+  //   );
+  //   console.log(req);
+  //   const json = await response.json();
+  //   res.status(200).json({ result: json.results[0].urls.regular });
+  //   return;
+  // } catch (error) {
+  //   console.error(error);
+  //   return {
+  //     statusCode: 500,
+  //     body: JSON.stringify({
+  //       message: "",
+  //     }),
+  //   };
+  // }
+  const requests = req.map(async (searchTerm) => {
+    try {
+      const response = await fetch(
+        `https://api.unsplash.com/search/photos?page=1&per_page=1&orientation=squarish&query=${searchTerm}&client_id=${process.env.UNSPLASH_API_KEY}`,
+        {
+          method: "GET",
+        }
+      );
+      const json = await response.json();
+      return json.results[0].urls.regular;
+    } catch (error) {
+      console.error(error);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+          message: "",
+        }),
+      };
+    }
+  });
 
-      res.send(body);
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .send({
-        error: "An error occurred while trying to retrieve the photos.",
-      });
-  }
+  const imageUrls = await Promise.all(requests);
+  res.status(200).json({ result: imageUrls });
+  console.log(imageUrls); // this will print an array of image URLs, one for each item in req
 }
