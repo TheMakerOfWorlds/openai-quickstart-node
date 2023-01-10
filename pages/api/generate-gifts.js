@@ -74,7 +74,7 @@ function generateGiftIdeasPrompt(
 function outputArray(inputString) {
   const outputArray = inputString.split("\n").map((item) => {
     let title = "";
-    let description = "";
+    let notes = "";
 
     if (item.match(/^\d/)) {
       item = item.slice(1);
@@ -95,21 +95,21 @@ function outputArray(inputString) {
           title = title.trim();
         }
       }
-      description = item.substring(titleEndIndex + 2);
-      description = description.trim();
-      if (description[0] == "-") {
-        description = description.slice(1);
-        description = description.trim();
+      notes = item.substring(titleEndIndex + 2);
+      notes = notes.trim();
+      if (notes[0] == "-" || notes[0] == ":") {
+        notes = notes.slice(1);
+        notes = notes.trim();
       }
     } else {
       title = "Gift Idea";
       if (item.trim() == "") {
         return;
       } else {
-        description = item.trim();
+        notes = item.trim();
       }
     }
-    return { title, description };
+    return { title, notes };
   });
   return outputArray.filter((n) => n);
 }

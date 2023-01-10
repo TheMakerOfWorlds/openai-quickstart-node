@@ -41,10 +41,9 @@ export default function Home() {
         <link rel="icon" href="/dog.png" />
       </Head>
 
-      {/* <main className={styles.main}>
-        <img src="/dog.png" className={styles.icon} />
-        <h3>Name my pet</h3>
-        <form onSubmit={onSubmit}>
+      <main className={styles.main}>
+        <h3>Name my gift plz</h3>
+        {/* <form onSubmit={onSubmit}>
           <input
             type="text"
             name="animal"
@@ -54,8 +53,8 @@ export default function Home() {
           />
           <input type="submit" value="Generate names" />
         </form>
-        <div className={styles.result}>{result}</div>
-      </main> */}
+        <div className={styles.result}>{result}</div> */}
+      </main>
     </div>
   );
 }
